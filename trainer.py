@@ -2,6 +2,8 @@ import os
 import shutil
 import logging
 from tqdm import tqdm, trange
+import json
+import time
 
 import numpy as np
 import torch
@@ -204,9 +206,8 @@ class Trainer(object):
         logger.info("\n" + show_report(out_label_list, preds_list))  # Get the report for each tag result
         # if args.log_dir is set, save the report
         if self.args.log_dir:
-            with open(os.path.join(self.args.log_dir, "report_{}.txt".format(step)), "w", encoding="utf-8") as f:
-                f.write(show_report(out_label_list, preds_list))
-        return results
+            with open(os.path.join(self.args.log_dir, "report_{}_{}.json".format(mode, self.args.model_type)), "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=4)
 
     def save_model(self, epoch=None):
         # Save model checkpoint (Overwrite)
