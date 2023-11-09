@@ -117,6 +117,8 @@ class KoBertTokenizer(PreTrainedTokenizer):
         return len(self.idx2token)
 
     def get_vocab(self):
+        if not hasattr(self, 'token2idx'):
+            return {} # pre-init
         return dict(self.token2idx, **self.added_tokens_encoder)
 
     def __getstate__(self):
