@@ -202,28 +202,32 @@ class Trainer(object):
         for key in sorted(results.keys()):
             logger.info("  %s = %s", key, str(results[key]))
         logger.info("\n" + show_report(out_label_list, preds_list))  # Get the report for each tag result
-
+        # if args.log_dir is set, save the report
+        if self.args.log_dir:
+            with open(os.path.join(self.args.log_dir, "report_{}.txt".format(step)), "w", encoding="utf-8") as f:
+                f.write(show_report(out_label_list, preds_list))
         return results
 
-    def save_model(self):
+    def save_model(self, epoch=None):
         # Save model checkpoint (Overwrite)
         if not os.path.exists(self.args.model_dir):
             os.makedirs(self.args.model_dir)
         model_to_save = self.model.module if hasattr(self.model, 'module') else self.model
-        model_to_save.save_pretrained(self.args.model_dir)
+        model_dir_to_save = self.args.model_dir if epoch is None else os.path.join(self.args.model_dir, str(epoch))
+        model_to_save.save_pretrained(model_dir_to_save)
 
         # Save training arguments together with the trained model
-        torch.save(self.args, os.path.join(self.args.model_dir, 'training_args.bin'))
-        logger.info("Saving model checkpoint to %s", self.args.model_dir)
+        torch.save(self.args, os.path.join(model_dir_to_save, 'training_args.bin'))
+        logger.info("Saving model checkpoint to %s", model_dir_to_save)
 
     def load_model(self):
         # Check whether model exists
         if not os.path.exists(self.args.model_dir):
-            raise Exception("Model doesn't exists! Train first!")
+            raise FileNotFoundError("Model doesn't exists! Train first!")
 
         try:
             self.model = self.model_class.from_pretrained(self.args.model_dir)
             self.model.to(self.device)
             logger.info("***** Model Loaded *****")
         except:
-            raise Exception("Some model files might be missing...")
+            raise FileNotFoundError(f"Some model files might be missing in {self.args.model_dir}")
