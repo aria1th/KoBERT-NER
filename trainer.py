@@ -209,7 +209,7 @@ class Trainer(object):
             # if the log_dir does not exist, create it
             if not os.path.exists(self.args.log_dir):
                 os.mkdir(self.args.log_dir)
-            with open(os.path.join(self.args.log_dir, "report_{}_{}.json".format(mode, self.args.model_type)), "w", encoding="utf-8") as f:
+            with open(os.path.join(self.args.log_dir, "report_{}_{}.json".format(step, self.args.model_type)), "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=4)
 
     def save_model(self, epoch=None):
