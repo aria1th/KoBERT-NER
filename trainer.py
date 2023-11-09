@@ -206,6 +206,9 @@ class Trainer(object):
         logger.info("\n" + show_report(out_label_list, preds_list))  # Get the report for each tag result
         # if args.log_dir is set, save the report
         if self.args.log_dir:
+            # if the log_dir does not exist, create it
+            if not os.path.exists(self.args.log_dir):
+                os.mkdir(self.args.log_dir)
             with open(os.path.join(self.args.log_dir, "report_{}_{}.json".format(mode, self.args.model_type)), "w", encoding="utf-8") as f:
                 json.dump(result, f, ensure_ascii=False, indent=4)
 
